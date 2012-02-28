@@ -1,19 +1,57 @@
-# To change this template, choose Tools | Templates
-# and open the template in the editor.
+"""
+    Este programa intenta ser el generador de puzzles válidos, siguiendo el
+    siguiente algoritmo[1]:
 
-__author__="gonzalo"
+PopulateBoard() 
+{ 
+ PopulateCell(0) 
+} 
+
+bool PopulateCell(index) 
+{ 
+ if (index==81 
+  return true; // the board is full!! 
+
+ // try setting each possible value in cell 
+ set cellorder = {1..9} // this list contains 1..9 in a *random* order 
+
+ for (i=0; i<9; i++) 
+ { 
+  // set this test value 
+  set cell[index] = cellorder[i] 
+
+  // is this board still valid? 
+  if(BoardValid()) 
+  { 
+   // it is so try to populate next cell 
+   if (PopulateCell(index+1)) 
+   { 
+    // if this cell returned true, then the board is valid 
+    return true; 
+   } 
+  } 
+ } 
+ // rollback this cell 
+ return false; 
+} 
+
+bool BoardValid() 
+{ 
+ // test constraints 
+ if (constraintsValid) 
+  return true; 
+ else 
+  return false; 
+}
+    
+[1] http://www.setbb.com/sudoku/viewtopic.php?t=314
+
+"""
+
+__author__="Gonzalo"
 __date__ ="$21/02/2012 18:56:55$"
 
 import random
-
-def random_list(list):
-    count = len(list)
-    for i in count:
-        val = random.choice(list)
-        list.remove(val)
-        list_temp.append(val)
-    return list_temp
-
 
 class Sudoku(object):
 
@@ -29,16 +67,14 @@ class Sudoku(object):
         if (index == 81):
             return True
         # probar con cada valor posible por celda
-        #valores_posibles = random.random()
-        #random.choice([1,2,3,4,5,6,7,8,9])
         valores_posibles = [1,2,3,4,5,6,7,8,9]
         valores_random = random.shuffle(valores_posibles)
         for i in valores_posibles:
-            celda[index] = valores_random[i]
+            self.board[index] = valores_random[i]
             if self.board_valido():
                 if self.poblar_celda(index+1):
                     return True
-        celda[index] = 0    # rollback esta celda
+        self.board[index] = 0    # rollback esta celda
         return False
 
     def board_valido(self):
@@ -58,4 +94,4 @@ class Sudoku(object):
 
 
 if __name__ == "__main__":
-    print "Hello World"
+    mi_board = Sudoku()
