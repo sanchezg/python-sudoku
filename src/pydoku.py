@@ -1,6 +1,6 @@
 """
-    Este programa intenta ser el generador de puzzles válidos, siguiendo el
-    siguiente algoritmo[1]:
+Este programa intenta ser el generador de puzzles vlidos, siguiendo el
+siguiente algoritmo[1]:
 
 PopulateBoard() 
 { 
@@ -55,9 +55,9 @@ import random
 
 class Sudoku(object):
 
-    def __init__(self):
+    def __init__(self, tamanio):
         """Inicia el board"""
-        self.board = []
+        self.board = [None for i in xrange(tamanio*tamanio)]
         self.poblar_board()
 
     def poblar_board(self):
@@ -68,9 +68,9 @@ class Sudoku(object):
             return True
         # probar con cada valor posible por celda
         valores_posibles = [1,2,3,4,5,6,7,8,9]
-        valores_random = random.shuffle(valores_posibles)
-        for i in valores_posibles:
-            self.board[index] = valores_random[i]
+        random.shuffle(valores_posibles)
+        for i in xrange(len(valores_posibles)):
+            self.board[index] = valores_posibles[i]
             if self.board_valido():
                 if self.poblar_celda(index+1):
                     return True
@@ -78,20 +78,56 @@ class Sudoku(object):
         return False
 
     def board_valido(self):
-        if self.cumple_requisitos():
-            return True
-        else:
-            return False
-
-    def cumple_requisitos(self):
+    	for celda in xrange(len(self.board)):
+    		 if self.en_fila(celda) or self.en_columna(celda) or self.en_cuadro(celda):
+    		 	return False
         return True
 
+    # Para que se cumpla la condicion de que no esten en la misma fila, hay que verificar que:
+    # 1) filas iguales
+    # 2) datos iguales
+    # 3) haya datos
+    def en_fila(self, celda):
+	for pos in xrange(len(self.board)):
+		if int(pos/9) == int(celda/9) and self.board[pos] == self.board[celda] and pos != celda and self.board[pos] != None:
+			return True
+        return False
+
+    # Para que se cumpla la condicion de que no esten en la misma columna, hay que verificar que:
+    # 1) columnas iguales
+    # 2) datos iguales
+    # 3) haya datos
+    def en_columna(self, celda):
+	for pos in xrange(len(self.board)):
+            if pos % 9 == celda % 9 and self.board[pos] == self.board[celda] and pos != celda and self.board[pos] != None:
+                return True
+	return False
+
+    # Para que se cumpla la condicion de que no esten en el mismo recuadro, hay que verificar que:
+    # 1) recuadros iguales
+    # 2) datos iguales
+    # 3) haya datos
+    def en_cuadro(self, celda):
+        for pos in xrange(len(self.board)):
+            if self.cuadro(pos) == self.cuadro(celda) and self.board[pos] == self.board[celda] and celda != pos and self.board[pos] != None:
+                return True
+        return False
+
+    def fila(self, celda):
+	return int(celda/9)
+		
+    def columna(self, celda):
+	return celda%9
+		
+    def cuadro(self, celda):
+	return (int(self.fila(celda)/3), self.columna(celda)%3)
+	
     def print_board(self):
         for fila in self.board:
-            for item in fila:
-                print item,
+            print fila
             print ""
 
 
 if __name__ == "__main__":
-    mi_board = Sudoku()
+    mi_board = Sudoku(9)
+    mi_board.print_board()
