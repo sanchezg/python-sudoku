@@ -101,14 +101,17 @@ class Sudoku(object):
 #
 #        valores_posibles = [1,2,3,4,5,6,7,8,9]
 #        random.shuffle(valores_posibles)
+#        test_board = self.board
 #
 #        for i in xrange(9):
-#            self.board[int(index/9)][index%9] = valores_posibles[i]
+#            test_board[int(index/9)][index%9] = valores_posibles[i]
 #            if (self.en_fila(int(index/9), valores_posibles[i]) == False) and (self.en_columna(index%9, valores_posibles[i]) == False) and (self.en_cuadro(int(round(int(index/9))/3), int(round((index%9)/3)), valores_posibles[i]) == False):
+#		self.board[int(index/9)][index%9] = test_board[int(index/9)][index%9]
 #                if (self.poblar_board(index+1) == True):
 #                    return True
 #        self.board[int(index/9)][index%9] = None
 #        return False
+
     def poblar_board(self):
         """Esta funcion completa el tablero creando un sudoku con las reglas basicas (level-1)"""
         random.seed()
@@ -175,5 +178,5 @@ class Sudoku(object):
 
 if __name__ == "__main__":
     mi_board = Sudoku()
-    mi_board.poblar_board()
+    mi_board.poblar_board(0)
     mi_board.print_board()
