@@ -53,11 +53,17 @@ __date__ ="$21/02/2012 18:56:55$"
 
 import random
 
-class Sudoku(object):
+FACIL = 35
+MEDIO = 50
+DIFICIL = 63
 
-    def __init__(self):
+class Sudoku(object):
+    def __init__(self, dificultad):
         """Inicializa el board (tablero) vacio."""
         self.limpiar_board()
+        self.dificultad = dificultad
+        self.solucion = []
+        self.puzzle = []
 
     def limpiar_board(self):
         """Para indicar un casillero vacio, se utiliza la convencion del foro,
@@ -66,51 +72,47 @@ class Sudoku(object):
         for fila in xrange(9):
             self.board.append([None for i in xrange(9)])
 
-    def print_board(self):
+    def print_board(self, board):
         """Funcion que imprime el board sin los corchetes y por fila"""
-        for fila in self.board:
+        miboard = []
+        if board == 'b':
+            # imprime el sudoku generado
+            miboard = self.board
+        elif board == 'p':
+            # imprime el puzzle generado a partir del board
+            miboard = self.puzzle
+        elif board == 's':
+            # imprime la solucion al puzzle realizada con el solver
+            #miboard == self.solucion
+            print self.solucion
+            return
+        for fila in miboard:
             for item in fila:
                 print item,
             print ""
+        print ""
 
-    def en_fila(self, fila, numero):
+    def en_fila(self, board, fila, numero):
         """Devuelve True si 'numero' se encuentra en la fila."""
-        if numero in self.board[fila] and numero != None:
+        if numero in board[fila] and numero != None:
             return True
         else:
             return False
 
-    def en_columna(self, col, numero):
+    def en_columna(self, board, col, numero):
         """Devuelve True si 'numero' se encuentra en la columna 'col'"""
         for fila in xrange(9):
-            if self.board[fila][col] == numero and numero != None:
+            if board[fila][col] == numero and numero != None:
                 return True
         return False
 
-    def en_cuadro(self, f_cuadro, c_cuadro, numero):
+    def en_cuadro(self, board, f_cuadro, c_cuadro, numero):
         """Devuelve True si 'numero' se encuentra en el cuadro [f_cuadro, c_cuadro]"""
         for fila in range(3 * f_cuadro, 3 * f_cuadro + 3):
             for col in range(3 * c_cuadro, 3 * c_cuadro + 3):
-                if self.board[fila][col] == numero and numero != None:
+                if board[fila][col] == numero and numero != None:
                     return True
         return False
-
-#    def poblar_board(self, index):
-#        if index == 81:
-#            return True
-#
-#        valores_posibles = [1,2,3,4,5,6,7,8,9]
-#        random.shuffle(valores_posibles)
-#        test_board = self.board
-#
-#        for i in xrange(9):
-#            test_board[int(index/9)][index%9] = valores_posibles[i]
-#            if (self.en_fila(int(index/9), valores_posibles[i]) == False) and (self.en_columna(index%9, valores_posibles[i]) == False) and (self.en_cuadro(int(round(int(index/9))/3), int(round((index%9)/3)), valores_posibles[i]) == False):
-#		self.board[int(index/9)][index%9] = test_board[int(index/9)][index%9]
-#                if (self.poblar_board(index+1) == True):
-#                    return True
-#        self.board[int(index/9)][index%9] = None
-#        return False
 
     def poblar_board(self):
         """Esta funcion completa el tablero creando un sudoku con las reglas basicas (level-1)"""
@@ -126,7 +128,7 @@ class Sudoku(object):
                 malas = 0
                 parar = 0
                 for elem in range(0, len(valores_posibles)):
-                    if (self.en_columna(col, valores_posibles[elem]) or self.en_fila(fila, valores_posibles[elem]) or self.en_cuadro(int(round(fila / 3)), int(round(col / 3)), valores_posibles[elem])):
+                    if (self.en_columna(self.board, col, valores_posibles[elem]) or self.en_fila(self.board, fila, valores_posibles[elem]) or self.en_cuadro(self.board, int(round(fila / 3)), int(round(col / 3)), valores_posibles[elem])):
                         malas += 1
                 # Si llegue al maximo de malas (valores que quedan por probar), tengo que reiniciar
                 if malas == len(valores_posibles):
@@ -139,7 +141,7 @@ class Sudoku(object):
                     prueba += 1
                 if parar == 0:
                     numero = random.randint(1, 9)
-                    while (self.en_columna(col, numero) or self.en_fila(fila, numero) or self.en_cuadro(int(round(fila / 3)), int(round(col / 3)), numero)):
+                    while (self.en_columna(self.board, col, numero) or self.en_fila(self.board, fila, numero) or self.en_cuadro(self.board, int(round(fila / 3)), int(round(col / 3)), numero)):
                         random.seed()
                         numero = random.randint(1, 9)
                     # El numero no se encuentra y cumple las condiciones, entonces asignar...
@@ -152,31 +154,82 @@ class Sudoku(object):
                 self.limpiar_board()
                 col = 0
 
-#    def puzzle_solver(self):
-        # candidatos es una matriz triple con una lista de candidatos por conjunto de fila-columna.
-#        self.candidatos = [[[1,2,3,4,5,6,7,8,9] for i in xrange(9)] for j in xrange(9)]
-#        tiene_solucion = True
-#        while tiene_solucion ==  True:
-#            for fila in xrange(9):
-#                for col in xrange(9):
-#                    if len(self.candidatos[fila][col]) == 1:
-                        # si hay un unico valor para esa celda, entonces es seguro que va ahi, sacarlos de las demas celdas
-#                        self.board[fila][col] == int(self.candidatos[fila][col])
-#                        for fila_t in xrange(9):
-#                            self.candidatos[fila_t][col].remove(self.board[fila][col])
-#                        for col_t in xrange(9):
-#                            self.candidatos[fila][col_t].remove(self.board[fila][col])
-#        return
+    def solver(self, board):
+        # Intenta resolver un puzzle con backtracking recursivo
+        mi_puzzle = board
+        try:
+            # encontrar una celda vacia0
+            pos = mi_puzzle.index(0)
+        except ValueError:
+            # se encontro una solucion
+            return mi_puzzle
 
-#    def crear_puzzle(self, index):
-#        fila = random.randint(1,9)
-#        col = random.randint(1,9)
+        for i in range(1,10):
+            mi_puzzle[pos] = i
+            #if self.pos_valida(mi_puzzle, pos):
+            if self.posicion_valida(mi_puzzle, pos):
+                # si asi como esta es valido, pasar al siguiente
+                soluc = self.solver(mi_puzzle)
+                if soluc:
+                    return soluc
 
-#        while 
+    def posicion_valida(self, puzzle, pos):
+        #esta funcion comprueba si la celda dada es valida dentro del puzzle indicado
+        #uso una unica funcion aca para comprobar por celda, y no por el board entero
+        fila, col = divmod(pos, 9)
 
+        v_tmp = []
+        h_tmp = []
+        for i in range(9):
+            nv = puzzle[(i*9)+col]
+            nh = puzzle[(fila*9)+i]
 
+            if nv in v_tmp or nh in h_tmp:
+                return False
+            if nv:
+                v_tmp.append(nv)
+            if nh:
+                h_tmp.append(nh)
+        f_cuadro = (fila/3)*3
+        c_cuadro = (col/3)*3
+        tmp = []
+        for i in range(3):
+            for j in range(3):
+                n = puzzle[(i*9)+(f_cuadro*9)+c_cuadro+j]
+                if n and n in tmp:
+                    return False
+                if n:
+                    tmp.append(n)
+        return True
+
+    def gen_puzzle(self):
+        # con el board lleno genera un puzzle, vaciando celdas al azar
+        # obtener posicion al azar
+        self.puzzle = self.board
+        i = 0
+        while (i < self.dificultad):
+            # esto es para dejar tantos casilleros como me defina el nivel de dificultad
+            pos = int(random.randint(0, 80))
+            fila, col = divmod(pos, 9)
+            if self.puzzle[fila][col] != 0:
+                self.puzzle[fila][col] = 0
+                i = i + 1
+
+    def puzzle_solver(self):
+        # esta fucnoin intenta generar una solucion al puzzle generado
+        #while self.solucion == []:
+        puzzle_t = []
+        for i in range(0,9):
+            for j in range(0,9):
+                puzzle_t.append(self.puzzle[i][j])
+        #print puzzle_t
+        self.solucion = self.solver(puzzle_t)
 
 if __name__ == "__main__":
-    mi_board = Sudoku()
-    mi_board.poblar_board(0)
-    mi_board.print_board()
+    mi_board = Sudoku(FACIL)
+    mi_board.poblar_board()
+    mi_board.print_board('b')
+    mi_board.gen_puzzle()
+    mi_board.print_board('p')
+    mi_board.puzzle_solver()
+    mi_board.print_board('s')
